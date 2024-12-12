@@ -10,19 +10,23 @@ export default {
         fadeIn: 'fadeIn 0.2s ease-in-out',
       },
       colors: {
-				'background': '#e3eaef',
-				'header': '#17192d',
-				'border':'#d8dfe6',
-				'button-company': '#023b78',
-				'button-company-active': '#2188ff',
-				'title': '#24292f',
-				'secondary': '#77818c'
+				'page': '#e3eaef',
+        'header': '#17192d',
+        'border-default': '#d8dfe6',
+        'primary': '#023b78',
+        'primary-active': '#2188ff',
+        'heading': '#24292f',
+        'muted': '#77818C',
 			},
       keyframes: {
         fadeIn: {
           '0%': { opacity: '0' },
           '100%': { opacity: '1' },
         },
+      },
+      fontFamily: {
+        'roboto': ['Roboto', 'sans-serif'],
+        'inter': ['Inter', 'sans-serif'],
       },
     },
   },

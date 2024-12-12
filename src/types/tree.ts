@@ -16,12 +16,12 @@ interface AssetNode extends BaseNode {
   type: 'asset'
 }
 
-interface ComponentNode extends BaseNode {
-  type: 'component'
-  sensorId: string
-  sensorType: 'vibration' | 'energy'
-  status: 'operating' | 'alert'
-  gatewayId: string
+export interface ComponentNode extends BaseNode {
+  type: 'component';
+  sensorId: string;
+  sensorType?: 'energy' | 'vibration';
+  status?: 'operating' | 'alert';
+  gatewayId: string;
 }
 
-export type TreeNode = LocationNode | AssetNode | ComponentNode
+export type TreeNode = LocationNode | AssetNode | ComponentNode;

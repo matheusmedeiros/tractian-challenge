@@ -1,10 +1,14 @@
 import { create } from 'zustand';
 import { Company } from '../types/api';
 
+import { useTreeStore } from './treeStore';
+
 interface FilterState {
-  searchTerm: string;
-  showEnergySensors: boolean;
-  showCriticalStatus: boolean;
+  filters: {
+    searchTerm: string;
+    showEnergySensors: boolean;
+    showCriticalStatus: boolean;
+  };
   selectedCompany: Company | null;
   collapsedNodes: Set<string>;
   hasFilter: boolean;
@@ -16,37 +20,45 @@ interface FilterState {
 }
 
 export const useFilterStore = create<FilterState>((set) => ({
-  searchTerm: '',
-  showEnergySensors: false,
-  showCriticalStatus: false,
+  filters: {
+    searchTerm: '',
+    showEnergySensors: false,
+    showCriticalStatus: false,
+  },
   selectedCompany: null,
   collapsedNodes: new Set(),
   hasFilter: false,
   setSearchTerm: (term) => set((state) => {
-    const hasFilter = !!(term || state.showEnergySensors || state.showCriticalStatus);
+    const hasFilter = !!(term || state.filters.showEnergySensors || state.filters.showCriticalStatus);
+    
+    if (hasFilter) {
+      useTreeStore.getState().resetCollapsed();
+    }
     
     return {
-      searchTerm: term,
-      hasFilter,
-      collapsedNodes: hasFilter ? new Set() : state.collapsedNodes
+      filters: { ...state.filters, searchTerm: term }
     };
   }),
   setShowEnergySensors: (show) => set((state) => {
-    const hasFilter = !!(state.searchTerm || show || state.showCriticalStatus);
+    const hasFilter = !!(state.filters.searchTerm || show || state.filters.showCriticalStatus);
     
+    if (hasFilter) {
+      useTreeStore.getState().resetCollapsed();
+    }
+
     return {
-      showEnergySensors: show,
-      hasFilter,
-      collapsedNodes: hasFilter ? new Set() : state.collapsedNodes
+      filters: { ...state.filters, showEnergySensors: show }
     };
   }),
   setShowCriticalStatus: (show) => set((state) => {
-    const hasFilter = !!(state.searchTerm || state.showEnergySensors || show);
+    const hasFilter = !!(state.filters.searchTerm || state.filters.showEnergySensors || show);
     
+    if (hasFilter) {
+      useTreeStore.getState().resetCollapsed();
+    }
+
     return {
-      showCriticalStatus: show,
-      hasFilter,
-      collapsedNodes: hasFilter ? new Set() : state.collapsedNodes
+      filters: { ...state.filters, showCriticalStatus: show }
     };
   }),
   setSelectedCompany: (company) => set({ selectedCompany: company }),
