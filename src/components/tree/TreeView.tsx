@@ -1,4 +1,4 @@
-import { useMemo, useRef, useState, useCallback } from "react";
+import { useMemo, useRef, useState } from "react";
 import { VariableSizeList as List } from "react-window";
 import AutoSizer from "react-virtualized-auto-sizer";
 import { twMerge } from "tailwind-merge";
@@ -61,17 +61,6 @@ export default function TreeView() {
     );
   }, [tree, filters, collapsedNodes]);
 
-  const debouncedSetSearchTerm = useCallback(
-    (value: string) => {
-      const timeoutId = setTimeout(() => {
-        setSearchTerm(value);
-      }, 1000);
-
-      return () => clearTimeout(timeoutId);
-    },
-    [setSearchTerm]
-  );
-
   const getItemSize = () => 42;
 
   if (!selectedCompany) return null;
@@ -100,8 +89,8 @@ export default function TreeView() {
             "[&::-webkit-search-cancel-button]:hidden"
           )}
           placeholder="Buscar Asset ou Location"
-          defaultValue={filters.searchTerm}
-          onChange={(e) => debouncedSetSearchTerm(e.target.value)}
+          value={filters.searchTerm}
+          onChange={(e) => setSearchTerm(e.target.value)}
           aria-label="Buscar na árvore"
         />
         {filters.searchTerm ? (
