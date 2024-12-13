@@ -1,4 +1,3 @@
-// src/api.ts
 import { Company, Location, Asset } from './types/api';
 
 const API_URL = 'https://fake-api.tractian.com';

@@ -1,6 +1,5 @@
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 
-// COMPONENTS
 import Panel from "./components/layout/Panel";
 import Header from "./components/layout/Header";
 

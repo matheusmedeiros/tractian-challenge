@@ -1,66 +1,38 @@
-import { TreeNode as TreeNodeType } from "../../types/tree";
+import { twMerge } from "tailwind-merge";
 
-// IMAGES
-import locationIcon from "../../assets/location-icon.svg";
-import assetIcon from "../../assets/assets-icon.svg";
-import componentIcon from "../../assets/components-icon.png";
-import boltIcon from "../../assets/bolt-icon.svg";
 import ellipseIcon from "../../assets/ellipse-alert-icon.svg";
+import boltIcon from "../../assets/bolt-icon.svg";
 import ellipsePositiveIcon from "../../assets/ellipse-positive-icon.svg";
 
-// TYPES
+import NodeIcon from "./NodeIcon";
+import LoadingState from "./states/Loading";
+import ErrorState from "./states/Error";
+import EmptyState from "./states/Empty";
+
 import { ComponentNode } from "../../types/tree";
+import { TreeNode as TreeNodeType } from "../../types/tree";
 
 interface TreeNodeProps {
   node: TreeNodeType;
+  className?: string;
   style: React.CSSProperties;
   isCollapsed?: boolean;
   onToggle?: () => void;
   isSelected?: boolean;
   onSelect?: () => void;
+  isLoading?: boolean;
+  error?: Error | null;
+  isEmpty?: boolean;
 }
 
-const getNodeIcon = (node: TreeNodeType, isSelected?: boolean) => {
-  const icons = {
-    location: locationIcon,
-    asset: assetIcon,
-    component: componentIcon,
-  };
-
-  const iconClass = `w-22 h-22 ${
-    node.type === "component" &&
-    (isSelected
-      ? "filter brightness-0 invert"
-      : node.status === "alert"
-      ? "text-red-500"
-      : "text-green-500")
-  }`;
-
-  return (
-    <img
-      src={icons[node.type]}
-      alt={node.type.charAt(0).toUpperCase() + node.type.slice(1)}
-      className={iconClass}
-    />
+const getNodeClasses = (isInteractive: boolean, isSelected = false) => {
+  return twMerge(
+    "flex items-center gap-2 py-2 rounded w-full",
+    isInteractive ? "cursor-pointer" : "cursor-default",
+    isSelected
+      ? "bg-primary-active text-white"
+      : isInteractive && "hover:bg-gray-50"
   );
-};
-
-const getNodeClasses = (
-  isInteractive: boolean,
-  isSelected: boolean,
-  isComponent: boolean
-) => {
-  const baseClasses = "flex items-center gap-2 py-2 rounded";
-  const cursorClass = isInteractive ? "cursor-pointer" : "cursor-default";
-  let stateClass = "";
-
-  if (isSelected && isComponent) {
-    stateClass = "bg-primary-active text-white";
-  } else if (isInteractive) {
-    stateClass = "hover:bg-gray-50";
-  }
-
-  return `${baseClasses} ${cursorClass} ${stateClass}`;
 };
 
 const getStatusIcon = (node: ComponentNode) => {
@@ -75,23 +47,43 @@ const getStatusIcon = (node: ComponentNode) => {
   return <img src={ellipsePositiveIcon} alt="Operating" />;
 };
 
+const getNodeIconClasses = (node: TreeNodeType, isSelected: boolean) => {
+  return twMerge(
+    "w-4 h-4",
+    isSelected && node.type === "component" && "brightness-0 invert"
+  );
+};
+
 export default function TreeNode({
   node,
   style,
-  isCollapsed,
+  isCollapsed = false,
   onToggle,
   isSelected = false,
   onSelect,
+  isLoading,
+  error,
+  isEmpty,
 }: TreeNodeProps) {
+  if (isLoading) return <LoadingState />;
+  if (error)
+    return (
+      <ErrorState
+        message={
+          error instanceof Error ? error.message : "Erro ao carregar dados"
+        }
+      />
+    );
+  if (isEmpty) return <EmptyState />;
+
   const hasChildren = node.children?.length > 0;
-  const isComponent = node.type === "component";
-  const isInteractive = hasChildren || isComponent;
+  const isInteractive = hasChildren || node.type === "component";
 
   const handleClick = (e: React.MouseEvent) => {
     e.stopPropagation();
     if (!isInteractive) return;
 
-    if (isComponent && onSelect) {
+    if (node.type === "component" && onSelect) {
       onSelect();
     }
     if (hasChildren && onToggle) {
@@ -100,33 +92,59 @@ export default function TreeNode({
   };
 
   return (
-    <div onClick={handleClick} style={style}>
-      <div
-        style={{ marginLeft: `${node.level * 20}px` }}
-        className={getNodeClasses(isInteractive, isSelected, isComponent)}
-      >
-        {hasChildren ? (
+    <div style={style} className="w-full">
+      <div style={{ paddingLeft: `${node.level * 20}px` }} className="w-full">
+        {isInteractive ? (
           <button
-            className="w-6 h-6 flex items-center justify-center rounded"
-            aria-label={isCollapsed ? "Expandir" : "Recolher"}
+            className={getNodeClasses(isInteractive, isSelected)}
+            onClick={handleClick}
+            aria-label={`${node.name} ${
+              hasChildren ? (isCollapsed ? "Expandir" : "Recolher") : ""
+            }`}
           >
-            <span
-              className={`chevron ${
-                isCollapsed ? "chevron-right" : "chevron-down"
-              }`}
+            {hasChildren ? (
+              <span
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onToggle?.();
+                }}
+                className={twMerge(
+                  "w-6 h-6",
+                  "flex items-center justify-center",
+                  "rounded"
+                )}
+              >
+                <span
+                  className={twMerge(
+                    "chevron",
+                    isCollapsed ? "chevron-right" : "chevron-down"
+                  )}
+                />
+              </span>
+            ) : (
+              <div className="w-6" />
+            )}
+
+            <NodeIcon
+              node={node}
+              className={getNodeIconClasses(node, isSelected)}
             />
+
+            <span className="text-sm truncate">{node.name}</span>
+
+            {node.type === "component" && (
+              <div className="mr-2">{getStatusIcon(node)}</div>
+            )}
           </button>
         ) : (
-          <div className="w-6" />
-        )}
-
-        <span className="w-6 flex justify-center">
-          {getNodeIcon(node, isSelected)}
-        </span>
-        <span className="font-roboto font-normal">{node.name}</span>
-
-        {isComponent && (
-          <span className="ml-1">{getStatusIcon(node as ComponentNode)}</span>
+          <div className={getNodeClasses(isInteractive, isSelected)}>
+            <div className="w-6" />
+            <NodeIcon
+              node={node}
+              className={getNodeIconClasses(node, isSelected)}
+            />
+            <span className="text-sm truncate">{node.name}</span>
+          </div>
         )}
       </div>
     </div>

@@ -1,28 +1,21 @@
 import { useMemo, useRef, useState } from "react";
 import { VariableSizeList as List } from "react-window";
 import AutoSizer from "react-virtualized-auto-sizer";
+import { twMerge } from "tailwind-merge";
 
-// Components
-import EmptyState from "../commons/EmptyState";
-import ErrorState from "../commons/Error";
-import LoadingState from "../commons/Loading";
 import TreeNode from "./TreeNode";
 
-// HOOKS
 import {
   useCompanyLocations,
   useCompanyAssets,
 } from "../../hooks/useCompanyData";
 
-// IMAGES
 import searchIcon from "../../assets/search-icon.svg";
 
-// STORE
 import { useFilterStore } from "../../store/filterStore";
 import { useCompanyStore } from "../../store/companyStore";
 import { useTreeStore } from "../../store/treeStore";
 
-// Utils
 import { buildTree } from "../../utils/treeBuider";
 import { processTree } from "../../utils/filterTree";
 
@@ -35,7 +28,6 @@ export default function TreeView() {
   const { selectedCompany } = useCompanyStore();
   const { collapsedNodes, toggleNode } = useTreeStore();
 
-  // Queries
   const {
     data: locations,
     isLoading: isLoadingLocations,
@@ -48,7 +40,6 @@ export default function TreeView() {
     error: assetsError,
   } = useCompanyAssets(selectedCompany?.id);
 
-  // Vars
   const error = locationsError || assetsError;
   const isLoading = isLoadingLocations || isLoadingAssets;
   const listRef = useRef<List>(null);
@@ -72,90 +63,89 @@ export default function TreeView() {
 
   const getItemSize = () => 42;
 
-  const Row = ({
-    index,
-    style,
-  }: {
-    index: number;
-    style: React.CSSProperties;
-  }) => (
-    <TreeNode
-      node={processedTree[index]}
-      style={style}
-      isCollapsed={collapsedNodes.has(processedTree[index].id)}
-      onToggle={() => toggleNode(processedTree[index].id)}
-      isSelected={
-        processedTree[index].type === "component" &&
-        processedTree[index].id === selectedComponentId
-      }
-      onSelect={
-        processedTree[index].type === "component"
-          ? () => setSelectedComponentId(processedTree[index].id)
-          : undefined
-      }
-    />
-  );
-
   if (!selectedCompany) return null;
 
-  const renderContent = (() => {
-    if (isLoading) {
-      return <LoadingState />;
-    }
-
-    if (error) {
-      return (
-        <ErrorState
-          message={
-            error instanceof Error ? error.message : "Erro ao carregar dados"
-          }
-        />
-      );
-    }
-
-    if (!processedTree.length) {
-      return <EmptyState />;
-    }
-
-    return (
-      <AutoSizer>
-        {({ height, width }) => (
-          <List
-            ref={listRef}
-            height={height}
-            width={width}
-            itemCount={processedTree.length}
-            itemSize={getItemSize}
-          >
-            {Row}
-          </List>
-        )}
-      </AutoSizer>
-    );
-  })();
-
   return (
-    <div className="flex flex-col grow-0 basis-[350px] lg:grow-[3] lg:basis-0 min-w-0 border border-border rounded">
-      <div className="flex items-center border-b border-border">
+    <div
+      className={twMerge(
+        "flex flex-col flex-1",
+        "min-w-0",
+        "border border-border rounded overflow-hidden"
+      )}
+      role="tree"
+      aria-label="Hierarquia de ativos"
+    >
+      <div className={twMerge("flex items-center border-b border-border")}>
+        <label className="sr-only" htmlFor="search-tree">
+          Buscar Asset ou Location
+        </label>
         <input
-          className="w-full p-3 outline-none font-inter font-normal"
+          id="search-tree"
+          type="search"
+          className={twMerge(
+            "w-full p-3",
+            "outline-none",
+            "font-inter font-normal"
+          )}
           placeholder="Buscar Asset ou Location"
           value={filters.searchTerm}
           onChange={(e) => setSearchTerm(e.target.value)}
+          aria-label="Buscar na árvore"
         />
         <div className="h-full aspect-square flex items-center justify-center text-secondary">
           {filters.searchTerm ? (
-            <div
-              className="close-icon cursor-pointer"
+            <button
               onClick={() => setSearchTerm("")}
-            />
+              className="p-2 hover:bg-gray-50 rounded-sm"
+              aria-label="Limpar busca"
+            >
+              <span className="close-icon" aria-hidden="true" />
+            </button>
           ) : (
-            <img src={searchIcon} alt="Search" className="w-4 h-4 opacity-50" />
+            <img
+              src={searchIcon}
+              alt=""
+              className="w-4 h-4 opacity-50"
+              aria-hidden="true"
+            />
           )}
         </div>
       </div>
 
-      <div className="flex-auto h-[600px]">{renderContent}</div>
+      <div className="flex-1 min-h-0 overflow-hidden" role="tree">
+        <AutoSizer>
+          {({ height, width }) => (
+            <List
+              ref={listRef}
+              height={height}
+              width={width}
+              itemCount={processedTree.length || 1}
+              itemSize={getItemSize}
+            >
+              {({ index, style }) => (
+                <TreeNode
+                  node={processedTree[index]}
+                  style={style}
+                  isCollapsed={collapsedNodes.has(processedTree[index]?.id)}
+                  onToggle={() => toggleNode(processedTree[index]?.id)}
+                  isSelected={
+                    processedTree[index]?.type === "component" &&
+                    processedTree[index]?.id === selectedComponentId
+                  }
+                  onSelect={
+                    processedTree[index]?.type === "component"
+                      ? () => setSelectedComponentId(processedTree[index].id)
+                      : undefined
+                  }
+                  isLoading={isLoading}
+                  error={error}
+                  isEmpty={!processedTree.length}
+                />
+              )}
+            </List>
+          )}
+        </AutoSizer>
+      </div>
     </div>
   );
 }

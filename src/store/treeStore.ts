@@ -1,4 +1,3 @@
-// src/store/treeStore.ts
 import { create } from 'zustand';
 
 interface TreeState {

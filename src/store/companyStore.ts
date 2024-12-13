@@ -1,4 +1,3 @@
-// src/store/companyStore.ts
 import { create } from 'zustand';
 import { Company } from '../types/api';
 
