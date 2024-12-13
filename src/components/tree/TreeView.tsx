@@ -92,8 +92,8 @@ export default function TreeView() {
           onChange={(e) => setSearchTerm(e.target.value)}
           aria-label="Buscar na árvore"
         />
-        <div className="h-full aspect-square flex items-center justify-center text-secondary">
-          {filters.searchTerm ? (
+        {filters.searchTerm ? (
+          <div className="h-full mb-4 mr-4 flex items-center justify-center text-secondary">
             <button
               onClick={() => setSearchTerm("")}
               className="p-2 hover:bg-gray-50 rounded-sm"
@@ -101,15 +101,17 @@ export default function TreeView() {
             >
               <span className="close-icon" aria-hidden="true" />
             </button>
-          ) : (
+          </div>
+        ) : (
+          <div className="h-full aspect-square flex items-center justify-center text-secondary">
             <img
               src={searchIcon}
               alt=""
               className="w-4 h-4 opacity-50"
               aria-hidden="true"
             />
-          )}
-        </div>
+          </div>
+        )}
       </div>
 
       <div className="flex-1 min-h-0 overflow-hidden" role="tree">

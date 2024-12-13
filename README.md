@@ -1,50 +1,85 @@
-# React + TypeScript + Vite
+<h1 align="center">
+  <br>
+  <br>
+  Tractian Frontend Challenge
+  <br>
+</h1>
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+<h4 align="center">A tree visualization application developed for Tractian's frontend challenge. Check out the live demo at <a href="https://tractian-challenge-nu.vercel.app/">https://tractian-challenge-nu.vercel.app/</a>.</h4>
 
-Currently, two official plugins are available:
+<p align="center">
+  <a href="#features">Features</a> •
+  <a href="#optimizations">Optimizations</a> •
+  <a href="#installation">Installation</a> •
+  <a href="#technologies">Technologies</a>
+</p>
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react/README.md) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+## Features
 
-## Expanding the ESLint configuration
+The application provides a hierarchical visualization of Tractian's data:
 
-If you are developing a production application, we recommend updating the configuration to enable type aware lint rules:
+- Tree structuring of locations and assets from the API
+- Integrated filtering system:
+  - Element name search
+  - Energy sensor filtering
+  - Critical status visualization
+- Intuitive tree structure navigation
+- Expandable/collapsible elements
+- View state persistence during filtering
 
-- Configure the top-level `parserOptions` property like this:
+## Optimizations
 
-```js
-export default tseslint.config({
-  languageOptions: {
-    // other options...
-    parserOptions: {
-      project: ['./tsconfig.node.json', './tsconfig.app.json'],
-      tsconfigRootDir: import.meta.dirname,
-    },
-  },
-})
+The project was developed with a focus on performance and usability:
+
+- Virtualization implementation for handling large data volumes
+- Performance optimization through memoization
+- Responsive design for all screen sizes
+- Optimized filtering system preserving hierarchies
+- Efficient state management with Zustand
+- Caching and revalidation system using React Query
+
+## Installation
+
+### Prerequisites
+
+Make sure you have installed:
+
+- [Git](https://git-scm.com)
+- [Node.js](https://nodejs.org/en/download/)
+
+### Step by Step
+
+```bash
+# Clone the repository
+$ git clone https://github.com/matheusmedeiros/tractian-challenge
+
+# Navigate to the project folder
+$ cd tractian-challenge
+
+# Install dependencies
+$ npm install
+
+# Start development server
+$ npm run dev
 ```
 
-- Replace `tseslint.configs.recommended` to `tseslint.configs.recommendedTypeChecked` or `tseslint.configs.strictTypeChecked`
-- Optionally add `...tseslint.configs.stylisticTypeChecked`
-- Install [eslint-plugin-react](https://github.com/jsx-eslint/eslint-plugin-react) and update the config:
+## Technologies
 
-```js
-// eslint.config.js
-import react from 'eslint-plugin-react'
+This project was built using:
 
-export default tseslint.config({
-  // Set the react version
-  settings: { react: { version: '18.3' } },
-  plugins: {
-    // Add the react plugin
-    react,
-  },
-  rules: {
-    // other rules...
-    // Enable its recommended rules
-    ...react.configs.recommended.rules,
-    ...react.configs['jsx-runtime'].rules,
-  },
-})
-```
+- React
+- Vite
+- TypeScript
+- Zustand
+- React Query
+- Tailwind
+
+## Future Improvements
+
+Given more time, these would be the next enhancements:
+
+- **Type Safety Enhancement**
+  - Implement Zod for runtime type validation and API response parsing, ensuring data consistency throughout the application's tree structure
+  - Accessibility improvements
+  - Preview components with mock to future endpoint implementation
+  - Add test to filter tree
