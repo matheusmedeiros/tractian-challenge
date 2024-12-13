@@ -1,4 +1,4 @@
-import { useMemo, useRef } from "react";
+import { useMemo, useRef, useState } from "react";
 import { VariableSizeList as List } from "react-window";
 import AutoSizer from "react-virtualized-auto-sizer";
 
@@ -27,6 +27,10 @@ import { buildTree } from "../../utils/treeBuider";
 import { processTree } from "../../utils/filterTree";
 
 export default function TreeView() {
+  const [selectedComponentId, setSelectedComponentId] = useState<string | null>(
+    null
+  );
+
   const { filters, setSearchTerm } = useFilterStore();
   const { selectedCompany } = useCompanyStore();
   const { collapsedNodes, toggleNode } = useTreeStore();
@@ -80,6 +84,15 @@ export default function TreeView() {
       style={style}
       isCollapsed={collapsedNodes.has(processedTree[index].id)}
       onToggle={() => toggleNode(processedTree[index].id)}
+      isSelected={
+        processedTree[index].type === "component" &&
+        processedTree[index].id === selectedComponentId
+      }
+      onSelect={
+        processedTree[index].type === "component"
+          ? () => setSelectedComponentId(processedTree[index].id)
+          : undefined
+      }
     />
   );
 
