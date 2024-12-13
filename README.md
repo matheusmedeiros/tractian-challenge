@@ -78,8 +78,7 @@ This project was built using:
 
 Given more time, these would be the next enhancements:
 
-- **Type Safety Enhancement**
-  - Implement Zod for runtime type validation and API response parsing, ensuring data consistency throughout the application's tree structure
-  - Accessibility improvements
-  - Preview components with mock to future endpoint implementation
-  - Add test to filter tree
+- Type Safety Enhancement: Implement Zod for runtime type validation and API response parsing, ensuring data consistency throughout the application's tree structure
+- Accessibility improvements
+- Preview components with mock to future endpoint implementation
+- Add test to filter tree
