@@ -1,5 +1,8 @@
 <h1 align="center">
   <br>
+    <a href="https://youtu.be/1J0XT1CHVMI">
+      <img src="https://img.youtube.com/vi/1J0XT1CHVMI/maxresdefault.jpg" alt="Project Demo Video" width="600">
+    </a>
   <br>
   Tractian Frontend Challenge
   <br>
@@ -82,3 +85,4 @@ Given more time, these would be the next enhancements:
 - Accessibility improvements
 - Preview components with mock to future endpoint implementation
 - Add test to filter tree
+- Add debounce to search filter
